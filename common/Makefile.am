@@ -28,6 +28,7 @@ DBGFLAGS = -g -DNDEBUG
 endif
 
 libswsscommon_la_SOURCES = \
+    events.cpp                \
     logger.cpp                \
     redisreply.cpp            \
     configdb.cpp              \

@@ -1,41 +1,12 @@
-#include <fstream>
-#include string.h
-#include json.hpp
-#include zmq.h
+#include events_pi.h
 
-#include logger.h
+const char *INIT_CFG = INIT_CFG_PATH;
 
-using namespace std;
-
-
-#define XSUB_END "tcp://*:5570"
-#define XPUB_END "tcp://*:5571"
-#define REQ_REP_END "tcp://*:5572"
-
-#define INIT_CFG "/etc/sonic/init_cfg.json"
-#define EVENTS_KEY  "events"
-#define XSUB_END_KEY "xsub_path"
-#define XPUB_END_KEY "xpub_path"
-#define REQ_REP_END_KEY "req_rep_path"
-
-#define REQ_SEND "hello"
-
+// Final set of paths
+//
 string xsub_path;
 string xpub_path;
 string req_rep_path;
-
-typedef uint64_t index_data_t;
-
-#define INDEX_EPOCH_BITS 0xFFFF
-#define INDEX_VAL_BITS 48
-#define INDEX_EPOCH_MASK ((INDEX_EPOCH_BITS) << (INDEX_VAL_BITS))
-
-#define ERR_CHECK(res, fmt, ...) \
-    if (!res) {\
-        stringstream _err_ss; \
-        _err_ss << __FUNCTION__ << ":" << __LINE__ << " " << fmt; \
-        SWSS_LOG_ERROR(_err_ss.str().c_str(), __VA_ARGS__);
-
 
 string &get_path(auto &data, const char *key, string &def)
 {
