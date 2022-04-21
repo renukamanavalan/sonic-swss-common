@@ -6,7 +6,13 @@
  */
 
 
-typedef void * event_handle_t;
+class events_base
+{
+    public:
+        virtual ~events_base() = default;
+};
+
+typedef events_base* event_handle_t;
 
 /*
  * One event publisher per source per caller
@@ -57,7 +63,7 @@ typedef std::vector<std::string> event_subscribe_sources_t;
  *  Non NULL handle on success
  *  NULL on failure
  */
-event_handle_t events_init_subscriber(const lst_subscribe_sources *=NULL);
+event_handle_t events_init_subscriber(const event_subscribe_sources_t *sources=NULL);
 
 
 /*
@@ -67,7 +73,7 @@ event_handle_t events_init_subscriber(const lst_subscribe_sources *=NULL);
  * event_metadata_t is a map of tag vs value.
  * The tags are listed below.
  */
-typedef std::map<string, string> event_metadata_t;
+typedef std::map<std::string, std::string> event_metadata_t;
 
 #define EVENT_METADATA_TAG_SENDER "sender"
 #define EVENT_METADATA_TAG_SOURCE "source"

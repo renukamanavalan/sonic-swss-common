@@ -2,14 +2,17 @@
  * Private header file
  * Required to run white box testing via unit tests.
  */
+#include <chrono>
 #include <fstream>
-#include string.h
-#include json.hpp
-#include zmq.h
+#include "string.h"
+#include "json.hpp"
+#include "zmq.h"
 
-#include logger.h
+#include "logger.h"
+#include "events.h"
 
 using namespace std;
+using namespace chrono;
 
 
 #define XSUB_END "tcp://*:5570"
@@ -17,7 +20,7 @@ using namespace std;
 #define REQ_REP_END "tcp://*:5572"
 
 #define INIT_CFG_PATH "/etc/sonic/init_cfg.json"
-extern const *INIT_CFG;
+extern const char *INIT_CFG;
 
 #define EVENTS_KEY  "events"
 #define XSUB_END_KEY "xsub_path"
@@ -26,32 +29,31 @@ extern const *INIT_CFG;
 
 #define REQ_SEND "hello"
 
-extern string xsub_path;
-extern string xpub_path;
-extern string req_rep_path;
-
 typedef uint64_t index_data_t;
 
-#define INDEX_EPOCH_BITS 0xFFFF
+#define INDEX_EPOCH_BITS 0xFFFFll
 #define INDEX_VAL_BITS 48
 #define INDEX_EPOCH_MASK ((INDEX_EPOCH_BITS) << (INDEX_VAL_BITS))
 
-#define ERR_CHECK(res, fmt, ...) \
-    if (!res) {\
-        stringstream _err_ss; \
-        _err_ss << __FUNCTION__ << ":" << __LINE__ << " " << fmt; \
-        SWSS_LOG_ERROR(_err_ss.str().c_str(), __VA_ARGS__);
+#define ERR_CHECK(res, ...) {\
+    if (!(res)) \
+        SWSS_LOG_ERROR(__VA_ARGS__); }
 
 
-string &get_path(auto &data, const char *key, string &def);
+typedef map<const char *, string> events_json_data_t;
+extern events_json_data_t tx_paths;
+
+#define XSUB_PATH tx_paths[XSUB_END_KEY].c_str()
+#define XPUB_PATH tx_paths[XPUB_END_KEY].c_str()
+#define REQ_REP_PATH tx_paths[REQ_REP_END_KEY].c_str()
 
 void init_path();
 
-uin64_t get_epoch();
+uint64_t get_epoch();
 
 string get_index(index_data_t &index);
 
-const string& get_timestamp();
+const string get_timestamp();
 
 template <typename Map> const string serialize(const Map& data);
 
@@ -59,7 +61,7 @@ template <typename Map> void deserialize(const string& s, Map& data);
 
 template <typename Map> void map_to_zmsg(const Map& data, zmq_msg_t &msg);
 
-template <typename Map> void zmsg_to_map(const zmq_msg_t &msg, Map& data);
+template <typename Map> void zmsg_to_map(zmq_msg_t &msg, Map& data);
 
 /*
  * A single instance per sender & source.
@@ -68,30 +70,30 @@ template <typename Map> void zmsg_to_map(const zmq_msg_t &msg, Map& data);
  *
  */
 
-class EventPublisher {
-    index_data_t m_index;
-
-    void *m_zmq_ctx;
-    void *m_socket;
-
-    // REQ socket is connected and a message is sent & received, more to 
-    // ensure PUB socket had enough time to establish connection.
-    // Any message published before connection establishment is dropped.
-    //
-    void *m_req_socket;
-
-    zmq_msg_t m_zmsg_source;
-    event_metadata_t m_metadata;
-
-
+class EventPublisher : public events_base {
     public:
+        index_data_t m_index;
+
+        void *m_zmq_ctx;
+        void *m_socket;
+
+        // REQ socket is connected and a message is sent & received, more to 
+        // ensure PUB socket had enough time to establish connection.
+        // Any message published before connection establishment is dropped.
+        //
+        void *m_req_socket;
+
+        zmq_msg_t m_zmsg_source;
+        event_metadata_t m_metadata;
+
+
         EventPublisher(const char *client_name, const char *event_source);
 
-        ~EventPublisher();
+        virtual ~EventPublisher();
 
         void event_publish(const char *tag, const event_params_t *params,
                 const char *timestamp = NULL);
-}
+};
 
 /*
  *  Receiver's instance to receive.
@@ -101,7 +103,7 @@ class EventPublisher {
  *
  */
 
-class EventSubscriber
+class EventSubscriber : public events_base
 {
     public:
 
@@ -116,18 +118,18 @@ class EventSubscriber
         //
         uint64_t m_missed_cnt;
 
-        EventSubscriber(event_subscribe_sources_t *subs_sources):
-            m_missed_cnt(0);
+        EventSubscriber(const event_subscribe_sources_t *subs_sources);
 
-        ~EventSubscriber();
+        virtual ~EventSubscriber();
 
         template <typename Map> bool do_receive(Map *data);
 
-        template <typename Map> void validate_meta(meta);
+        template <typename Map> bool validate_meta(const Map &meta);
 
-        index_data_t update_missed(meta);
+        template <typename Map>
+        index_data_t update_missed(Map &meta);
 
         void event_receive(event_metadata_t &metadata, event_params_t &params,
                 unsigned long *missed_count = NULL);
-}
+};
 
