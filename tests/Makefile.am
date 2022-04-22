@@ -11,7 +11,7 @@ endif
 CFLAGS_GTEST =
 LDADD_GTEST = -L/usr/src/gtest -lgtest -lgtest_main -lgmock -lgmock_main
 
-tests_SOURCES = events.cpp                  \
+tests_SOURCES = events_ut.cpp               \
                 redis_ut.cpp                \
                 redis_piped_ut.cpp          \
                 redis_state_ut.cpp          \

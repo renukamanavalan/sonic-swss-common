@@ -15,15 +15,15 @@
   " QUH(XSUB_END_KEY) ": " QUH(TEST_PATH) ", \
   " QUH(REQ_REP_END_KEY) ": " QUH(TEST_PATH) " }}"
 
-#define TMP_FILE "/tmp/test_events";
+#define TMP_FILE "/tmp/test_events"
 
 TEST(TestCommon, TestPaths) 
 {
     init_path();
 
-    EXPECT_EQ(xsub_path, XSUB_END);
-    EXPECT_EQ(xpub_path, XPUB_END);
-    EXPECT_EQ(req_rep_path, REQ_REP_END);
+    EXPECT_EQ(XSUB_PATH, XSUB_END);
+    EXPECT_EQ(XPUB_PATH, XPUB_END);
+    EXPECT_EQ(REQ_REP_PATH, REQ_REP_END);
 
     {
         ofstream tmp(TMP_FILE);
@@ -33,9 +33,9 @@ TEST(TestCommon, TestPaths)
     INIT_CFG = TMP_FILE;
     init_path();
 
-    EXPECT_EQ(xsub_path, TEST_PATH);
-    EXPECT_EQ(xpub_path, XPUB_END);
-    EXPECT_EQ(req_rep_path, TEST_PATH);
+    EXPECT_EQ(XSUB_PATH, TEST_PATH);
+    EXPECT_EQ(XPUB_PATH, XPUB_END);
+    EXPECT_EQ(REQ_REP_PATH, TEST_PATH);
 
 }
 

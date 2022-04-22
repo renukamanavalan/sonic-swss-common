@@ -156,7 +156,9 @@ EventPublisher::EventPublisher(const char *client_name, const char *event_source
     }
 
     zmq_msg_init_size(&m_zmsg_source, strlen(event_source));
-    strncpy((char *)zmq_msg_data(&m_zmsg_source), event_source, strlen(event_source));
+
+
+    memcpy((char *)zmq_msg_data(&m_zmsg_source), event_source, strlen(event_source));
 
     m_metadata[EVENT_METADATA_TAG_SENDER] = client_name;
     m_metadata[EVENT_METADATA_TAG_SOURCE] = event_source;
