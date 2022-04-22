@@ -159,6 +159,7 @@ T castSelectableObj(swss::Selectable *temp)
 %include "redisselect.h"
 %include "redistran.h"
 %include "configdb.h"
+%include "events.h"
 
 %extend swss::DBConnector {
     %template(hgetall) hgetall<std::map<std::string, std::string>>;

@@ -14,11 +14,6 @@
 using namespace std;
 using namespace chrono;
 
-
-#define XSUB_END "tcp://*:5570"
-#define XPUB_END "tcp://*:5571"
-#define REQ_REP_END "tcp://*:5572"
-
 #define INIT_CFG_PATH "/etc/sonic/init_cfg.json"
 extern const char *INIT_CFG;
 
@@ -26,6 +21,14 @@ extern const char *INIT_CFG;
 #define XSUB_END_KEY "xsub_path"
 #define XPUB_END_KEY "xpub_path"
 #define REQ_REP_END_KEY "req_rep_path"
+
+#define XSUB_END "tcp://*:5570"
+#define XPUB_END "tcp://*:5571"
+#define REQ_REP_END "tcp://*:5572"
+
+#define XSUB_PATH tx_paths[XSUB_END_KEY].c_str()
+#define XPUB_PATH tx_paths[XPUB_END_KEY].c_str()
+#define REQ_REP_PATH tx_paths[REQ_REP_END_KEY].c_str()
 
 #define REQ_SEND "hello"
 
@@ -42,10 +45,6 @@ typedef uint64_t index_data_t;
 
 typedef map<const char *, string> events_json_data_t;
 extern events_json_data_t tx_paths;
-
-#define XSUB_PATH tx_paths[XSUB_END_KEY].c_str()
-#define XPUB_PATH tx_paths[XPUB_END_KEY].c_str()
-#define REQ_REP_PATH tx_paths[REQ_REP_END_KEY].c_str()
 
 void init_path();
 
