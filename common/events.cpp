@@ -236,6 +236,14 @@ events_init_publisher(const char *event_sender, const char *event_source)
 }
 
 void
+events_deinit_publisher(event_handle_t &handle)
+{
+    EventPublisher *pub = dynamic_cast<EventPublisher *>(&handle);
+    delete pub;
+    handle = NULL;
+}
+
+void
 event_publish(event_handle_t handle, const char *tag, const event_params_t *params,
         const char *timestamp)
 {
@@ -388,6 +396,14 @@ event_handle_t
 events_init_subscriber(const event_subscribe_sources_t *sources)
 {
     return new EventSubscriber(sources);
+}
+
+void
+events_deinit_subscriber(event_handle_t &handle)
+{
+    EventSubscriber *sub = dynamic_cast<EventSubscriber *>(&handle);
+    delete sub;
+    handle = NULL;
 }
 
 void

@@ -31,6 +31,17 @@ typedef events_base* event_handle_t;
 
 event_handle_t events_init_publisher(const char *event_sender, const char *event_source);
 
+/*
+ * De-init/free the publisher
+ *
+ * Input: 
+ *  Handle returned from events_init_publisher
+ *
+ * Output: 
+ *  None
+ */
+void events_deinit_publisher(event_handle_t &handle);
+
 typedef std::map<std::string, std::string> event_params_t;
 
 /*
@@ -48,7 +59,6 @@ typedef std::map<std::string, std::string> event_params_t;
 void event_publish(event_handle_t handle, const char *tag, const event_params_t *params=NULL,
         const char *timestamp=NULL);
 
-
 typedef std::vector<std::string> event_subscribe_sources_t;
 
 /*
@@ -64,6 +74,17 @@ typedef std::vector<std::string> event_subscribe_sources_t;
  *  NULL on failure
  */
 event_handle_t events_init_subscriber(const event_subscribe_sources_t *sources=NULL);
+
+/*
+ * De-init/free the subscriber
+ *
+ * Input: 
+ *  Handle returned from events_init_subscriber
+ *
+ * Output: 
+ *  None
+ */
+void events_deinit_subscriber(event_handle_t &handle);
 
 
 /*

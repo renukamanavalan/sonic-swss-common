@@ -156,8 +156,10 @@ TEST(TestEvent, TestPublisher)
 
     EXPECT_EQ(0, memcmp(zmq_msg_data(&pub->m_zmsg_source), source, strlen(source)));
 
-}
+    events_deinit_subscriber(h);
+    EXPECT_EQ(NULL, h);
 
+}
 
 TEST(TestEvent, TestSubscriber)
 {
@@ -170,5 +172,12 @@ TEST(TestEvent, TestSubscriber)
 
     EXPECT_EQ(0, sub->m_missed_cnt);
 
+    events_deinit_subscriber(h);
+    EXPECT_EQ(NULL, h);
+
+}
+
+TEST(TestEvent, TestPublish)
+{
 }
 
