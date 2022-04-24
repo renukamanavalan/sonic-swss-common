@@ -7,15 +7,21 @@ const char *INIT_CFG = INIT_CFG_PATH;
 
 // Final set of paths
 //
-events_json_data_t tx_paths = {
+events_json_data_t tx_paths_default = {
     events_json_data_t::value_type(XSUB_END_KEY, XSUB_END),
     events_json_data_t::value_type(XPUB_END_KEY, XPUB_END),
     events_json_data_t::value_type(REQ_REP_END_KEY, REQ_REP_END) };
+
+events_json_data_t tx_paths;
 
 
 void init_path()
 {
     ifstream fs (INIT_CFG);
+
+    // Set defaults
+    //
+    events_json_data_t(tx_paths_default).swap(tx_paths);
 
     if (!fs.is_open())
         return;
@@ -92,8 +98,7 @@ const string get_timestamp()
 }
 
 
-template <typename Map>
-const string serialize(const Map& data)
+const string serialize(const map_str_str_t& data)
 {
     std::stringstream ss;
     boost::archive::text_oarchive oarch(ss);
@@ -101,18 +106,17 @@ const string serialize(const Map& data)
     return ss.str();
 }
 
-template <typename Map>
-void deserialize(const string& s, Map& data)
+void deserialize(const string& s, map_str_str_t& data)
 {
     std::stringstream ss;
+    ss << s;
     boost::archive::text_iarchive iarch(ss);
     iarch >> data;
     return;
 }
 
 
-template <typename Map>
-void map_to_zmsg(const Map& data, zmq_msg_t &msg)
+void map_to_zmsg(const map_str_str_t& data, zmq_msg_t &msg)
 {
     string s = serialize(data);
 
@@ -121,8 +125,7 @@ void map_to_zmsg(const Map& data, zmq_msg_t &msg)
 }
 
 
-template <typename Map>
-void zmsg_to_map(zmq_msg_t &msg, Map& data)
+void zmsg_to_map(zmq_msg_t &msg, map_str_str_t& data)
 {
     string s((const char *)zmq_msg_data(&msg), zmq_msg_size(&msg));
     deserialize(s, data);
@@ -156,7 +159,6 @@ EventPublisher::EventPublisher(const char *client_name, const char *event_source
     }
 
     zmq_msg_init_size(&m_zmsg_source, strlen(event_source));
-
 
     memcpy((char *)zmq_msg_data(&m_zmsg_source), event_source, strlen(event_source));
 
@@ -273,9 +275,8 @@ EventSubscriber::~EventSubscriber()
 }
 
 
-template <typename Map>
 bool
-EventSubscriber::do_receive(Map *data)
+EventSubscriber::do_receive(map_str_str_t *data)
 {
     zmq_msg_t msg;
     int more = 0;
@@ -296,9 +297,8 @@ EventSubscriber::do_receive(Map *data)
 
 }
 
-template <typename Map>
 bool
-EventSubscriber::validate_meta(const Map &meta)
+EventSubscriber::validate_meta(const map_str_str_t &meta)
 {
     static string keys[] = { \
         EVENT_METADATA_TAG_SENDER, \
@@ -317,9 +317,8 @@ EventSubscriber::validate_meta(const Map &meta)
 }
 
 
-template <typename Map>
 index_data_t
-EventSubscriber::update_missed(Map &meta)
+EventSubscriber::update_missed(map_str_str_t &meta)
 {
     stringstream key;
     index_data_t missed = 0;

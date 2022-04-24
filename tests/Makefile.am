@@ -11,8 +11,7 @@ endif
 CFLAGS_GTEST =
 LDADD_GTEST = -L/usr/src/gtest -lgtest -lgtest_main -lgmock -lgmock_main
 
-tests_SOURCES = events_ut.cpp               \
-                redis_ut.cpp                \
+tests_SOURCES = redis_ut.cpp                \
                 redis_piped_ut.cpp          \
                 redis_state_ut.cpp          \
                 redis_piped_state_ut.cpp    \
@@ -36,8 +35,9 @@ tests_SOURCES = events_ut.cpp               \
                 boolean_ut.cpp              \
                 status_code_util_test.cpp   \
                 saiaclschema_ut.cpp         \
-                main.cpp
+                main.cpp                    \
+                events_ut.cpp
 
 tests_CFLAGS = $(DBGFLAGS) $(AM_CFLAGS) $(CFLAGS_COMMON) $(CFLAGS_GTEST) $(LIBNL_CFLAGS)
 tests_CPPFLAGS = $(DBGFLAGS) $(AM_CFLAGS) $(CFLAGS_COMMON) $(CFLAGS_GTEST) $(LIBNL_CFLAGS)
-tests_LDADD = $(LDADD_GTEST) -lpthread -L$(top_srcdir)/common -lswsscommon $(LIBNL_LIBS) $(CODE_COVERAGE_LIBS)
+tests_LDADD = $(LDADD_GTEST) -lpthread -lzmq -lboost_serialization -L$(top_srcdir)/common -lswsscommon $(LIBNL_LIBS) $(CODE_COVERAGE_LIBS)

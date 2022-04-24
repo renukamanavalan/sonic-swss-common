@@ -22,9 +22,9 @@ extern const char *INIT_CFG;
 #define XPUB_END_KEY "xpub_path"
 #define REQ_REP_END_KEY "req_rep_path"
 
-#define XSUB_END "tcp://*:5570"
-#define XPUB_END "tcp://*:5571"
-#define REQ_REP_END "tcp://*:5572"
+#define XSUB_END "tcp://127.0.0.1:5570"
+#define XPUB_END "tcp://127.0.0.1:5571"
+#define REQ_REP_END "tcp://127.0.0.1:5572"
 
 #define XSUB_PATH tx_paths[XSUB_END_KEY].c_str()
 #define XPUB_PATH tx_paths[XPUB_END_KEY].c_str()
@@ -43,8 +43,10 @@ typedef uint64_t index_data_t;
         SWSS_LOG_ERROR(__VA_ARGS__); }
 
 
-typedef map<const char *, string> events_json_data_t;
+typedef map<string, string> events_json_data_t;
 extern events_json_data_t tx_paths;
+
+typedef map<string, string> map_str_str_t;
 
 void init_path();
 
@@ -54,13 +56,13 @@ string get_index(index_data_t &index);
 
 const string get_timestamp();
 
-template <typename Map> const string serialize(const Map& data);
+const string serialize(const map_str_str_t & data);
 
-template <typename Map> void deserialize(const string& s, Map& data);
+void deserialize(const string& s, map_str_str_t & data);
 
-template <typename Map> void map_to_zmsg(const Map& data, zmq_msg_t &msg);
+void map_to_zmsg(const map_str_str_t & data, zmq_msg_t &msg);
 
-template <typename Map> void zmsg_to_map(zmq_msg_t &msg, Map& data);
+void zmsg_to_map(zmq_msg_t &msg, map_str_str_t & data);
 
 /*
  * A single instance per sender & source.
@@ -121,12 +123,11 @@ class EventSubscriber : public events_base
 
         virtual ~EventSubscriber();
 
-        template <typename Map> bool do_receive(Map *data);
+        bool do_receive(map_str_str_t  *data);
 
-        template <typename Map> bool validate_meta(const Map &meta);
+        bool validate_meta(const map_str_str_t  &meta);
 
-        template <typename Map>
-        index_data_t update_missed(Map &meta);
+        index_data_t update_missed(map_str_str_t  &meta);
 
         void event_receive(event_metadata_t &metadata, event_params_t &params,
                 unsigned long *missed_count = NULL);
